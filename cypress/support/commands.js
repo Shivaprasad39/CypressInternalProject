@@ -89,9 +89,22 @@ Cypress.Commands.add('placeOrderByCheque',() =>{
   SfCheckOutPage.getAgreeDisclaimerCheckBox().check()
   SfCheckOutPage.getAgreeDisclaimerBtn().click()   
   SfCheckOutPage.getPayByChequeBtn().click()
-  SfCheckOutPage.getPlaceOrderBtn().click()
+  SfCheckOutPage.getChequePlaceOrderBtn().click()
   cy.getTextOf(SfCheckOutPage.getOrderNumber())
-  cy.setTextValue('setOrderNumber')
+  cy.setTextValue('setOrderNumber')  
+})
+
+Cypress.Commands.add('placeOrderByHDollar',(firstName, lastName, hEmail ) =>{
+  SfCheckOutPage.getAgreeDisclaimerCheckBox().check()
+  SfCheckOutPage.getAgreeDisclaimerBtn().click()   
+  SfCheckOutPage.getPayByHDollarBtn().click()
+  SfCheckOutPage.getFirstNameField().type(firstName)
+  SfCheckOutPage.getLastNameField().type(lastName)
+  SfCheckOutPage.getHimalayaEmailField().type(hEmail)
+  SfCheckOutPage.getHDollarCheckBox().check()
+  SfCheckOutPage.getHDollarPlaceOrderBtn().click()  
+  cy.getTextOf(SfCheckOutPage.getOrderNumber())  
+  cy.setTextValue('setOrderNumber') 
 })
 
 Cypress.Commands.add('ErpUserLogin',(ErpUserName, ErpUserPassword) =>{
@@ -105,7 +118,7 @@ Cypress.Commands.add('confirmPayment',() =>{
   ErpTransactionPage.getTransactionList().click()
   const getOrderNumberKey = 'getOrderNumber' 
   cy.getTextValue(getOrderNumberKey)
-  cy.typeTextValue(ErpTransactionPage.getOrderIdField())
+  cy.typeTextValue(ErpTransactionPage.getOrderIdField()) 
   ErpTransactionPage.getSearchBtn().click()
   cy.wait(2000)
   ErpTransactionPage.getViewBtn().click()
