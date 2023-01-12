@@ -50,6 +50,12 @@ import 'cypress-if'
 let orderNumber
 let loginText
 let varName1
+let getOrderNumber
+let tierLevel
+let noOfMembership
+let orderCostValue
+let tierSelectedValue
+let membershipNoSelectedValue
 const SfAccountPage = new sfAccountPage()
 const SfCheckOutPage = new sfCheckOutPage()
 const SfExtraCardPage = new sfExtraCardPage()
@@ -79,19 +85,49 @@ Cypress.Commands.add('purchaseMembership',() =>{
   SfAccountPage.getMTOrderType().click()
   SfExtraCardPage.getAddMoreCardsBtn().click()
   SfExtraCardPage.getTierLevelPopup().click()
-  SfExtraCardPage.getSelectTierLevel().click() 
-  SfExtraCardPage.getNumberOfTierField().type('1')  
+  SfExtraCardPage.getSelectTierLevel().click()
+  SfExtraCardPage.getSelectTierLevel().then(function(tierSelect){
+    tierSelectedValue = tierSelect.text()
+    cy.log("tierSelectedValue: "+ tierSelectedValue)
+  })
+  SfExtraCardPage.getNumberOfTierField().type('2').invoke('val').then(function(membershipNoSelect){
+    membershipNoSelectedValue = membershipNoSelect
+    cy.log("membershipNoSelectedValue: "+ membershipNoSelectedValue)
+  }) 
   SfExtraCardPage.getAgreementCheckBox().click()
   SfExtraCardPage.getNextBtn().click()
 })
 
 Cypress.Commands.add('placeOrderByCheque',() =>{
   SfCheckOutPage.getAgreeDisclaimerCheckBox().check()
-  SfCheckOutPage.getAgreeDisclaimerBtn().click()   
+  SfCheckOutPage.getAgreeDisclaimerBtn().click()
+  cy.get('div:nth-child(1)>p:nth-child(1)~p').then(function(tier){
+    let tierLevelSplit = tier.text().split(" ")
+    tierLevel = tierLevelSplit[2]
+    cy.log("tierLevel: "+ tierLevel)
+  })
+  cy.get('div:nth-child(1)>p:nth-child(1)~p').then(function(membership){
+    let membershipSplit = membership.text().split(" ")
+    noOfMembership = membershipSplit[5].slice(0,1)
+    cy.log("noOfMembership: "+ noOfMembership)
+  })
+  cy.get('div:nth-child(1)>p:nth-child(3)').then(function(orderCost){
+    let orderCostSplit = orderCost.text().split(" ")
+    orderCostValue = orderCostSplit[0].slice(1)
+    cy.log("orderCostValue: "+ orderCostValue)
+  })
+ 
+  cy.pause() 
+  SfExtraCardPage.getNextBtn().click()
+  ////  
   SfCheckOutPage.getPayByChequeBtn().click()
   SfCheckOutPage.getChequePlaceOrderBtn().click()
-  cy.getTextOf(SfCheckOutPage.getOrderNumber())
-  cy.setTextValue('setOrderNumber')  
+  SfCheckOutPage.getOrderNumber().then(function(orderNumber){
+    getOrderNumber = orderNumber.text()
+    cy.log("order Number:"+" "+getOrderNumber)
+  })
+  // cy.getTextOf(SfCheckOutPage.getOrderNumber())
+  // cy.setTextValue('setOrderNumber')  
 })
 
 Cypress.Commands.add('placeOrderByHDollar',(firstName, lastName, hEmail ) =>{
@@ -102,9 +138,13 @@ Cypress.Commands.add('placeOrderByHDollar',(firstName, lastName, hEmail ) =>{
   SfCheckOutPage.getLastNameField().type(lastName)
   SfCheckOutPage.getHimalayaEmailField().type(hEmail)
   SfCheckOutPage.getHDollarCheckBox().check()
-  SfCheckOutPage.getHDollarPlaceOrderBtn().click()  
-  cy.getTextOf(SfCheckOutPage.getOrderNumber())  
-  cy.setTextValue('setOrderNumber') 
+  SfCheckOutPage.getHDollarPlaceOrderBtn().click() 
+  SfCheckOutPage.getOrderNumber().then(function(orderNumber){
+    getOrderNumber = orderNumber.text()
+    cy.log("order Number:"+" "+getOrderNumber)
+  }) 
+  // cy.getTextOf(SfCheckOutPage.getOrderNumber())  
+  // cy.setTextValue('setOrderNumber') 
 })
 
 Cypress.Commands.add('ErpUserLogin',(ErpUserName, ErpUserPassword) =>{
@@ -115,10 +155,12 @@ ErpLoginPage.getLoginBtn().click()
 })
 
 Cypress.Commands.add('confirmPayment',() =>{
-  ErpTransactionPage.getTransactionList().click()
-  const getOrderNumberKey = 'getOrderNumber' 
-  cy.getTextValue(getOrderNumberKey)
-  cy.typeTextValue(ErpTransactionPage.getOrderIdField()) 
+  ErpTransactionPage.getTransactionList().click()  
+  ErpTransactionPage.getOrderIdField().type(getOrderNumber)
+  cy.log(getOrderNumber+"------- test-------")
+  // const getOrderNumberKey = 'getOrderNumber' 
+  // cy.getTextValue(getOrderNumberKey)
+  // cy.typeTextValue(ErpTransactionPage.getOrderIdField()) 
   ErpTransactionPage.getSearchBtn().click()
   cy.wait(2000)
   ErpTransactionPage.getViewBtn().click()
