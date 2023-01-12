@@ -116,10 +116,6 @@ Cypress.Commands.add('placeOrderByCheque',() =>{
     orderCostValue = orderCostSplit[0].slice(1)
     cy.log("orderCostValue: "+ orderCostValue)
   })
- 
-  cy.pause() 
-  SfExtraCardPage.getNextBtn().click()
-  ////  
   SfCheckOutPage.getPayByChequeBtn().click()
   SfCheckOutPage.getChequePlaceOrderBtn().click()
   SfCheckOutPage.getOrderNumber().then(function(orderNumber){
