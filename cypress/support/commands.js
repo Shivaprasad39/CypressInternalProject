@@ -50,12 +50,6 @@ import 'cypress-if'
 let orderNumber
 let loginText
 let varName1
-let getOrderNumber
-let tierLevel
-let noOfMembership
-let orderCostValue
-let tierSelectedValue
-let membershipNoSelectedValue
 const SfAccountPage = new sfAccountPage()
 const SfCheckOutPage = new sfCheckOutPage()
 const SfExtraCardPage = new sfExtraCardPage()
@@ -81,49 +75,117 @@ Cypress.Commands.add('acceptCookie', ()=>{
   SfLandingPage.getAcceptCookiesBtn().click()
 })
 
+let tierValExtraCard
+let membershipNumValExtraCard
 Cypress.Commands.add('purchaseMembership',() =>{
   SfAccountPage.getMTOrderType().click()
   SfExtraCardPage.getAddMoreCardsBtn().click()
   SfExtraCardPage.getTierLevelPopup().click()
   SfExtraCardPage.getSelectTierLevel().click()
-  SfExtraCardPage.getSelectTierLevel().then(function(tierSelect){
-    tierSelectedValue = tierSelect.text()
-    cy.log("tierSelectedValue: "+ tierSelectedValue)
+  SfExtraCardPage.getSelectTierLevel().then(function(tierExtraCard){
+    tierValExtraCard = tierExtraCard.text()
+    cy.log("tierValExtraCard: "+ tierValExtraCard)
   })
-  SfExtraCardPage.getNumberOfTierField().type('2').invoke('val').then(function(membershipNoSelect){
-    membershipNoSelectedValue = membershipNoSelect
-    cy.log("membershipNoSelectedValue: "+ membershipNoSelectedValue)
+  SfExtraCardPage.getNumberOfTierField().type('2').invoke('val').then(function(membershipNumExtraCard){
+    membershipNumValExtraCard = membershipNumExtraCard
+    cy.log("membershipNumValExtraCard: "+ membershipNumValExtraCard)
   }) 
   SfExtraCardPage.getAgreementCheckBox().click()
   SfExtraCardPage.getNextBtn().click()
 })
 
+let membershipNumValUpgrade
+Cypress.Commands.add('upgradeMembership', ()=>{
+  cy.contains('UPGRADE').click()
+  cy.get('table > tbody > tr').each(row=>{
+    cy.wrap(row).within(()=>{
+      cy.get('td').each(col=>{            
+           if(col.text() == membershipNumValMembership){
+           membershipNumValUpgrade = col.text()
+           cy.log("membershipNumValUpgrade: "+ membershipNumValUpgrade)
+           cy.get('td:nth-child(5)').click()        
+          }   
+      })     
+    })
+  })
+  cy.get('li[data-value= "5"]').click()
+  cy.contains("Next").click()
+  SfExtraCardPage.getAgreementCheckBox().click()
+  SfExtraCardPage.getNextBtn().click()
+})
+
+let membershipNumValMembership
+Cypress.Commands.add('membership', ()=>{
+  cy.get('div:nth-child(13)').contains('MEMBERSHIP').click()
+  cy.get('tbody > tr > td:nth-child(1)').then(function(membershipNumMembership){
+    membershipNumValMembership = membershipNumMembership.text()
+    cy.log("membershipNumValMembership: "+ membershipNumValMembership)
+  })
+  cy.contains('ACCOUNT').click()
+})
+
+let orderNumberValCheckOut
+let tierValCheckOut
+let membershipNumValCheckOut
+let tierCostValCheckOut
+let gFashionPercValCheckOut
+let annualFeeValCheckOut
+let membershipCreditValCheckOut
+let totalCostValCheckOut
 Cypress.Commands.add('placeOrderByCheque',() =>{
   SfCheckOutPage.getAgreeDisclaimerCheckBox().check()
   SfCheckOutPage.getAgreeDisclaimerBtn().click()
-  cy.get('div:nth-child(1)>p:nth-child(1)~p').then(function(tier){
-    let tierLevelSplit = tier.text().split(" ")
-    tierLevel = tierLevelSplit[2]
-    cy.log("tierLevel: "+ tierLevel)
+  cy.get('div:nth-child(1)>p:nth-child(1)~p').then(function(tierCheckOut){
+    let tierCheckOutSplit = tierCheckOut.text().split(" ")
+    tierValCheckOut = tierCheckOutSplit[2]
+    cy.log("tierValCheckOut: "+ tierValCheckOut)
   })
-  cy.get('div:nth-child(1)>p:nth-child(1)~p').then(function(membership){
-    let membershipSplit = membership.text().split(" ")
-    noOfMembership = membershipSplit[5].slice(0,1)
-    cy.log("noOfMembership: "+ noOfMembership)
+  cy.get('div:nth-child(1)>p:nth-child(1)~p').then(function(membershipNumCheckOut){
+    let membershipNumCheckOutSplit = membershipNumCheckOut.text().split(" ")
+    membershipNumValCheckOut = membershipNumCheckOutSplit[5].slice(0,1)
+    cy.log("membershipNumValCheckOut: "+ membershipNumValCheckOut)
   })
-  cy.get('div:nth-child(1)>p:nth-child(3)').then(function(orderCost){
-    let orderCostSplit = orderCost.text().split(" ")
-    orderCostValue = orderCostSplit[0].slice(1)
-    cy.log("orderCostValue: "+ orderCostValue)
+  cy.get('div:nth-child(1)>p:nth-child(3)').then(function(tierCostCheckOut){
+    let tierCostCheckOutSplit = tierCostCheckOut.text().split(" ")
+    tierCostValCheckOut = tierCostCheckOutSplit[0].slice(1)
+    cy.log("tierCostValCheckOut: "+ tierCostValCheckOut)
+    // expect(tierValExtraCard).to.equal(tierValCheckOut)
+    // expect(membershipNumValExtraCard).to.equal(membershipNumValCheckOut)
+  })
+  cy.get('div:nth-child(1)>p:nth-child(5)').then(function(gFashionPercCheckOut){
+    let gFashionPercCheckOutSplit = gFashionPercCheckOut.text().split(" ")
+    gFashionPercValCheckOut = gFashionPercCheckOutSplit[0].slice(0,2)
+    cy.log("gFashionPercValCheckOut: "+ gFashionPercValCheckOut)
+  })
+  cy.get('div:nth-child(1)>p:nth-child(8)').then(function(annualFeeCheckOut){
+    let annualFeeCheckOutSplit = annualFeeCheckOut.text().split(" ")
+    annualFeeValCheckOut = annualFeeCheckOutSplit[3].slice(2)
+    cy.log("annualFeeValCheckOut: "+ annualFeeValCheckOut)
+  })
+  cy.get('div:nth-child(1)>p:nth-child(10)').then(function(membershipCreditCheckOut){
+    let membershipCreditCheckOutSplit = membershipCreditCheckOut.text().split(" ")
+    membershipCreditValCheckOut = membershipCreditCheckOutSplit[0].slice(1)
+    cy.log("membershipCreditValCheckOut: "+ membershipCreditValCheckOut)
+  })
+  cy.get('div:nth-child(2)>p:nth-child(1)').then(function(totalCostCheckOut){
+    let totalCostCheckOutSplit = totalCostCheckOut.text().split(" ")
+    totalCostValCheckOut = totalCostCheckOutSplit[1].slice(1)
+    cy.log("totalCostValCheckOut: "+ totalCostValCheckOut)
+      cy.then(function(){
+      for(let i = tierValExtraCard; i<=tierValExtraCard; i++){
+        // if(tierCostValCheckOut == tierValExtraCard){
+        expect(parseToNumber(tierCostValCheckOut)).to.equal(parseToNumber(tierValExtraCard)*parseToNumber(membershipNumValExtraCard)*10000) 
+        cy.log(parseToNumber(tierValExtraCard)+" "+"test") 
+        // }
+      }
+    })      
   })
   SfCheckOutPage.getPayByChequeBtn().click()
   SfCheckOutPage.getChequePlaceOrderBtn().click()
-  SfCheckOutPage.getOrderNumber().then(function(orderNumber){
-    getOrderNumber = orderNumber.text()
-    cy.log("order Number:"+" "+getOrderNumber)
+  SfCheckOutPage.getOrderNumber().then(function(orderNumberCheckOut){
+    orderNumberValCheckOut = orderNumberCheckOut.text()
+    cy.log("orderNumberValCheckOut:"+" "+orderNumberValCheckOut)
   })
-  // cy.getTextOf(SfCheckOutPage.getOrderNumber())
-  // cy.setTextValue('setOrderNumber')  
 })
 
 Cypress.Commands.add('placeOrderByHDollar',(firstName, lastName, hEmail ) =>{
@@ -135,12 +197,10 @@ Cypress.Commands.add('placeOrderByHDollar',(firstName, lastName, hEmail ) =>{
   SfCheckOutPage.getHimalayaEmailField().type(hEmail)
   SfCheckOutPage.getHDollarCheckBox().check()
   SfCheckOutPage.getHDollarPlaceOrderBtn().click() 
-  SfCheckOutPage.getOrderNumber().then(function(orderNumber){
-    getOrderNumber = orderNumber.text()
-    cy.log("order Number:"+" "+getOrderNumber)
-  }) 
-  // cy.getTextOf(SfCheckOutPage.getOrderNumber())  
-  // cy.setTextValue('setOrderNumber') 
+  SfCheckOutPage.getOrderNumber().then(function(orderNumberCheckOut){
+    orderNumberValCheckOut = orderNumberCheckOut.text()
+    cy.log("orderNumberValCheckOut:"+" "+orderNumberValCheckOut)
+  })  
 })
 
 Cypress.Commands.add('ErpUserLogin',(ErpUserName, ErpUserPassword) =>{
@@ -150,16 +210,19 @@ ErpLoginPage.getPassword().type(ErpUserPassword)
 ErpLoginPage.getLoginBtn().click()
 })
 
+let tierValOrderDetail
 Cypress.Commands.add('confirmPayment',() =>{
   ErpTransactionPage.getTransactionList().click()  
-  ErpTransactionPage.getOrderIdField().type(getOrderNumber)
-  cy.log(getOrderNumber+"------- test-------")
-  // const getOrderNumberKey = 'getOrderNumber' 
-  // cy.getTextValue(getOrderNumberKey)
-  // cy.typeTextValue(ErpTransactionPage.getOrderIdField()) 
+  ErpTransactionPage.getOrderIdField().type(orderNumberValCheckOut)
   ErpTransactionPage.getSearchBtn().click()
   cy.wait(2000)
   ErpTransactionPage.getViewBtn().click()
+  cy.get('td>div>p').then(function(tierOrderDetail){
+    let tierOrderDetailSplit = tierOrderDetail.text().split(" ")
+    tierValOrderDetail = tierOrderDetailSplit[1]
+    cy.log("tierOrderDetailVal: "+ tierValOrderDetail)
+    expect(tierValCheckOut).to.equal(tierValOrderDetail)
+  })
   ErpOrderDetailsPage.getConfirmPaymentBtn().click()
   ErpOrderDetailsPage.getAgreeConfirmBtn().click()   
 })
@@ -210,6 +273,10 @@ Cypress.Commands.add('typeTextValue',(pageObject) =>{
     pageObject.type(text)
   })
 })
+
+function parseToNumber(str) {
+  return parseFloat(str.split(',').join(''));
+}
 
 ///For my reference
 // cy.getTextOf(SfLoginPage.getLoginBtn())

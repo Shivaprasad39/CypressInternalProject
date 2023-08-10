@@ -44,8 +44,6 @@ module.exports = defineConfig({
       })
       // cy.task('setOrderNumber', orderNumber)
       // cy.task('getOrderNumber')
-
-
     },
   },
 });
